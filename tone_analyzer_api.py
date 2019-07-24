@@ -3,7 +3,7 @@ import json
 from os.path import join, dirname
 from ibm_watson import ToneAnalyzerV3
 from ibm_watson.tone_analyzer_v3 import ToneInput
-from task import getHotels
+from helper import getHotels
 from Hotel import Hotel
 
 app = Flask(__name__)
@@ -19,10 +19,13 @@ service = ToneAnalyzerV3(
 def getTones():
     listOfHotels = getHotels()
     for hotel in listOfHotels:
-        reviewsString = ".".join(hotel.reviews)
+        reviewsString = ".".join(map(str, hotel.reviews))
         sents = service.tone(
                     tone_input=reviewsString,
-                    content_type="text/plain").get_result()
+                    content_type="text/plain",
+                    headers = {
+                    'timeout': '100'
+                        }).get_result()
         if "sentences_tone" in sents:
             for sent in sents['sentences_tone']:
                 if "tones" in sent:
@@ -36,7 +39,7 @@ def getTones():
                         elif(tone['tone_id']=='anger'):
                             hotel.angerCount = hotel.angerCount+1
                             hotel.angerComm = hotel.angerComm+tone['score']
-        return listOfHotels
+    return listOfHotels
 
 def calculateNomalization(listOfHotels):
     for hotel in listOfHotels:

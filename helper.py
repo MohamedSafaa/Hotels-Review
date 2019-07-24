@@ -19,8 +19,6 @@ def getHotels():
     listOfHotels = [Hotel(i , hotels[hotels['name']==i]['reviews.text']) for i in hotelsNames]
     return listOfHotels
 
-#print(listOfHotels[1].name)
-
 
 
 
